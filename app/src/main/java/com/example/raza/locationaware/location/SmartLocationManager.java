@@ -78,6 +78,8 @@ public class SmartLocationManager implements
     public static final int LOCATION_PROVIDER_NETWORK_ONLY_RESTICTION = 3;
     private int mForceNetworkProviders = 0;
 
+    private boolean isPermissionAllowed = false;
+
     public SmartLocationManager(Context context, Activity activity, LocationManagerInterface locationInterface, int providerType, int locationPiority, long locationFetchInterval, long fastestLocationFetchInterval, int forceNetworkProviders) {
         mContext = context;
         mActivity = activity;
@@ -100,8 +102,8 @@ public class SmartLocationManager implements
         // 2) check if gps is available
         // 3) get location using awesome strategy
 
-        askLocationPermission();                            // for android version 6 above
-        checkNetworkProviderEnable(mForceNetworkProviders);                       //
+//        askLocationPermission();                            // for android version 6 above
+        checkNetworkProviderEnable();
 
         if (isGooglePlayServicesAvailable())                // if googleplay services available
             initLocationObjts();                            // init obj for google play service and start fetching location
@@ -214,11 +216,6 @@ public class SmartLocationManager implements
                     getLastKnownLocation();
                 } else {
                     setNewLocation(getBetterLocation(location, mLocationFetched), mLocationFetched);
-//                    if (isLocationAccurate(location) && location.getAccuracy() < STANDARD_LOCATION_ACCURACY && location.getSpeed() < STANDARD_LOCATION_SEED_LIMIT) {// no use of this if
-//                        setNewLocation(getBetterLocation(location, mLocationFetched), mLocationFetched);
-//                    } else {
-//                        setNewLocation(getBetterLocation(location, mLocationFetched), mLocationFetched);
-//                    }
                 }
             }
 
@@ -301,7 +298,7 @@ public class SmartLocationManager implements
     }
 
     //  Android M Permission check
-    public void askLocationPermission() {
+    public boolean askLocationPermission() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
@@ -317,12 +314,13 @@ public class SmartLocationManager implements
                             .setCancelable(false)
                             .setPositiveButton("Allow", new DialogInterface.OnClickListener() {
                                 public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                                    Toast.makeText(mContext, "Welcome", Toast.LENGTH_SHORT).show();
+                                    isPermissionAllowed = true;
                                 }
                             })
                             .setNegativeButton("Deny", new DialogInterface.OnClickListener() {
                                 public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                                    mActivity.finish();
+                                    isPermissionAllowed = false;
+//                                    mActivity.finish();
                                 }
                             });
                     final AlertDialog alert = builder.create();
@@ -335,47 +333,51 @@ public class SmartLocationManager implements
 
             }
         }
+        return isPermissionAllowed;
     }
 
-    public void checkNetworkProviderEnable(int enforceActive) {
+    public void checkNetworkProviderEnable() {
         locationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
 
         isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
-        if (!isGPSEnabled && !isNetworkEnabled) {
+        // getting network status
+        if (!isGPSEnabled && !isNetworkEnabled && mForceNetworkProviders == LOCATION_PROVIDER_ALL_RESTICTION) {
+            Toast.makeText(mContext, "Location can't be fetched! Enable your location providers and relaunch the application", Toast.LENGTH_SHORT).show(); // show alert
+            mActivity.finish();
+        } else if (!isGPSEnabled && !isNetworkEnabled) {
             buildAlertMessageTurnOnLocationProviders("Your location providers seems to be disabled, please enable it", "OK", "Cancel");
         } else if (!isGPSEnabled && mForceNetworkProviders == LOCATION_PROVIDER_GPS_ONLY_RESTICTION) {
             buildAlertMessageTurnOnLocationProviders("Your GPS seems to be disabled, please enable it", "OK", "Cancel");
         } else if (!isNetworkEnabled && mForceNetworkProviders == LOCATION_PROVIDER_NETWORK_ONLY_RESTICTION) {
             buildAlertMessageTurnOnLocationProviders("Your Network location provider seems to be disabled, please enable it", "OK", "Cancel");
         }
-        // getting network status
 
-        if (!isGPSEnabled && !isNetworkEnabled) {
-            Toast.makeText(mContext, "Location can't be fetched!", Toast.LENGTH_SHORT).show(); // show alert
-            mActivity.finish();
-        }
     }
 
     private void buildAlertMessageTurnOnLocationProviders(String message, String positiveButtonText, String negativeButtonText) {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
-        builder.setMessage(message)
-                .setCancelable(false)
-                .setPositiveButton(positiveButtonText, new DialogInterface.OnClickListener() {
-                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                        Intent mIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                        mIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        mContext.startActivity(mIntent);
-                    }
-                })
-                .setNegativeButton(negativeButtonText, new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                        mActivity.finish();
-                    }
-                });
-        final AlertDialog alert = builder.create();
-        alert.show();
+        try {
+            AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+            builder.setMessage(message)
+                    .setCancelable(false)
+                    .setPositiveButton(positiveButtonText, new DialogInterface.OnClickListener() {
+                        public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                            Intent mIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                            mIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            mContext.startActivity(mIntent);
+                        }
+                    })
+                    .setNegativeButton(negativeButtonText, new DialogInterface.OnClickListener() {
+                        public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                            mActivity.finish();
+                        }
+                    });
+            AlertDialog alert = builder.create();
+            alert.show();
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+        }
     }
 
 

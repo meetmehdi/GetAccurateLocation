@@ -17,6 +17,7 @@ public class LocationActivity extends BaseActivityLocation {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location);
+        initLocationFetching(LocationActivity.this);
         initViews();
     }
 
@@ -34,4 +35,5 @@ public class LocationActivity extends BaseActivityLocation {
         mLocationProviderTV.setText(locationProvider);
         mlocationTimeTV.setText(time);
     }
+
 }
