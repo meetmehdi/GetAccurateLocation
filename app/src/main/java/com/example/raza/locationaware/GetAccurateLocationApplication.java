@@ -20,7 +20,6 @@ public class GetAccurateLocationApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
         initApplication();
     }
 

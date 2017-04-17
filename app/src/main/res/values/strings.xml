@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">GetAccurateLocation</string>
+    <string name="not_found">Location still not found</string>
+
+    <string name="dashboard_permission_denied">One of the Permission is still denied</string>
+    <string name="err">Error</string>
 </resources>
