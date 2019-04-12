@@ -1,17 +1,21 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion '25.0.0'
+    compileSdkVersion 27
+    buildToolsVersion '28.0.3'
 
     defaultConfig {
         applicationId "com.example.raza.locationaware"
-        minSdkVersion 11
-        targetSdkVersion 23
+        minSdkVersion 15
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
     }
     buildTypes {
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -20,6 +24,6 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:23.4.0'
-    compile 'com.google.android.gms:play-services-location:9.8.0'
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.google.android.gms:play-services-location:16.0.0'
 }
