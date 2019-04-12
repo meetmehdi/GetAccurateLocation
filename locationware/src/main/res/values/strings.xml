@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">LocationWare</string>
+
+    <string name="location_not_fetched_enable">Location cannot be fetched.Enable your location providers and relaunch the application</string>
+    <string name="location_provider_disable">Your location providers seems to be disabled.Please enable it.</string>
+    <string name="enable_locations">Please enable location providers!!!</string>
+    <string name="setting">Setting</string>
+    <string name="cancel">Cancel</string>
+</resources>

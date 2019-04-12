@@ -1,4 +1,4 @@
-package com.example.raza.locationaware;
+package com.example.raza.getaccuratelocation;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -10,9 +10,8 @@ import android.support.v7.app.AppCompatActivity;
  * Created by Syed Raza Mehdi Naqvi on 8/16/2016.
  */
 
-public class BaseActivity extends AppCompatActivity {
-
-    public static Activity mActivity;
+public abstract class BaseActivity extends AppCompatActivity {
+    public Activity mActivity;
 
     @Override
     public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
@@ -40,7 +39,6 @@ public class BaseActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
     }
-
 
     @Override
     protected void onStop() {

@@ -1,4 +1,4 @@
-package com.example.raza.locationaware;
+package com.example.raza.getaccuratelocation;
 
 import android.app.Application;
 import android.content.Context;
